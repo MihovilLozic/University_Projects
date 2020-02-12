@@ -1,0 +1,584 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include<cmath>
+
+using namespace std;
+
+int mrezaZaIP(vector<int>ipMreze, int broj) {
+	int obrnuto[8];
+	int granica = broj - 8;
+
+	int brojac = 0;
+	for (int i = broj - 1; i >= granica; i--)
+	{
+		obrnuto[brojac] = ipMreze[i];
+		brojac++;
+	}
+
+	int mreza_dekadski = 0;
+
+	for (int i = 0; i < 8; i++) {
+		int val = 1;
+		for (int j = 0; j < i; j++) {
+			val *= 10;
+		}
+		mreza_dekadski += obrnuto[i] * val;
+
+	}
+
+	int  a[15], k, brojac_dva, suma;
+	k = brojac_dva = suma = 0;
+
+	while (mreza_dekadski > 0)
+	{
+		a[k] = mreza_dekadski % 10;
+		mreza_dekadski = mreza_dekadski / 10;
+		k++;
+		brojac_dva++;
+
+	}
+	k = 0;
+	while (k < brojac_dva)
+	{
+		suma = suma + (a[k] * pow(2, k));
+		k++;
+	}
+	return suma;
+}
+
+
+int BinUDec(int brojJed) {
+	int rez = 0;
+	int okt;
+	okt = (brojJed / 8 + 1);
+	for (int i = 0; i < brojJed - 8 * (okt - 1); i++) {
+		rez <<= 1;
+		rez += 1;
+	}
+	rez <<= 8 - (brojJed - 8 * (okt - 1));
+	return rez;
+}
+int BinUDecip(int brojJed) {
+	int rez = 0;
+	int okt;
+	okt = (brojJed / 8 + 1);
+	for (int i = 0; i < brojJed - 8 * (okt - 1); i++) {
+		rez <<= 1;
+		rez += 1;
+	}
+	rez <<= 8 - (brojJed - 8 * (okt - 1));
+
+	int reza = 255 - rez;
+	return reza;
+}
+
+void subnet() {
+	char klasa;
+	int hostovi;
+	int ipKlasa[4];
+	//Odabir Klasa
+	cout << "CHOOSE THE CLASS (A, B or C)!" << endl << "NOTE: WRITE IN SMALL LETTERS!" << endl;
+	cin >> klasa;
+	cin.ignore();
+
+	switch (klasa)
+	{
+	case 'a':
+		ipKlasa[0] = 10;
+		ipKlasa[1] = 0;
+		ipKlasa[2] = 0;
+		ipKlasa[3] = 0;
+
+		break;
+	case 'b':
+		ipKlasa[0] = 172;
+		ipKlasa[1] = 16;
+		ipKlasa[2] = 0;
+		ipKlasa[3] = 0;
+		break;
+	case 'c':
+		ipKlasa[0] = 192;
+		ipKlasa[1] = 168;
+		ipKlasa[2] = 0;
+		ipKlasa[3] = 0;
+		break;
+	default: subnet();
+		break;
+	}
+	//Broj Hostova
+	cout << "Enter the number of hosts!" << endl;
+	cin >> hostovi;
+	cin.ignore();
+	//Racunjanje broadcast-a
+	int potencija = 0;
+	int temporary = 0;
+	while (temporary < hostovi)
+	{
+		temporary += pow(2, potencija);
+		temporary - (temporary - 2);
+		potencija++;
+	}
+	cout << "The potency of Number 2 to cover the number of hosts is: " << potencija << " ==> " << pow(2, potencija) << endl;
+	int brojJedinica = 32 - potencija;
+	cout << "The number of ones must be: 32-potency => " << brojJedinica << endl;
+
+	for (int i = 0; i < 32; i++)
+	{
+
+		if (i == 8 || i == 16 || i == 24)
+		{
+			cout << ".";
+		}
+
+		if (i < brojJedinica)
+		{
+			cout << 1;
+		}
+		else
+		{
+			cout << 0;
+		}
+	}
+	cout << endl << endl;
+
+	int subnet_postava[4];
+
+	if (brojJedinica <9)
+	{
+		subnet_postava[0] = 255 - BinUDec(brojJedinica);
+		subnet_postava[1] = 255;
+		subnet_postava[2] = 255;
+		subnet_postava[3] = 255;
+	}
+	else if (brojJedinica >= 8 && brojJedinica <= 16)
+	{
+		subnet_postava[0] = 0;
+		subnet_postava[1] = 255 - BinUDec(brojJedinica);
+		subnet_postava[2] = 255;
+		subnet_postava[3] = 255;
+	}
+	else if (brojJedinica >= 16 && brojJedinica <= 24)
+	{
+		subnet_postava[0] = 0;
+		subnet_postava[1] = 0;
+		subnet_postava[2] = 255 - BinUDec(brojJedinica);
+		subnet_postava[3] = 255;
+	}
+	else
+	{
+		subnet_postava[0] = 0;
+		subnet_postava[1] = 0;
+		subnet_postava[2] = 0;
+		subnet_postava[3] = 255 - BinUDec(brojJedinica);
+	}
+
+	cout << endl;
+	cout<<"_______________________________________________________________________________________________________________________"<<endl;
+	cout << "NETWORK: " << ipKlasa[0] << "." << ipKlasa[1] << "." << ipKlasa[2] << "." << ipKlasa[3] << endl;
+	cout << "FIRST USEFUL IP ADDRESS: " << ipKlasa[0] << "." << ipKlasa[1] << "." << ipKlasa[2] << "." << ipKlasa[3] + 1 << endl;
+
+	cout << "BROADCAST: ";
+	int broadcast[4];
+	for (int i = 0; i < 4; i++)
+	{
+		broadcast[i] = subnet_postava[i] + ipKlasa[i];
+		if (broadcast[i] > 255)
+		{
+			int temp = broadcast[i] - 255;
+			ipKlasa[i - 1]++;
+			broadcast[i] = temp;
+
+		}
+		if (i == 1 || i == 2 || i == 3)
+		{
+			cout << ".";
+		}
+		cout << broadcast[i];
+	}
+	//zadnja korisna IP adresa
+	cout << endl;
+	int subnet_postavaa[4];
+
+	subnet_postavaa[0] = broadcast[0];
+	subnet_postavaa[1] = broadcast[1];
+	subnet_postavaa[2] = broadcast[2];
+	subnet_postavaa[3] = broadcast[3] - 1;
+
+	cout << "LAST USEFUL IP ADDRESS: ";
+	for (int i = 0; i < 4; i++)
+	{
+		if (i == 1 || i == 2 || i == 3)
+		{
+			cout << ".";
+		}
+		cout << subnet_postavaa[i];
+	}
+
+	//Izracun subnet maske
+	cout << endl;
+	cout << "SUBNET MASK: ";
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (i == 1 || i == 2 || i == 3)
+		{
+			cout << ".";
+		}
+
+		cout << 255 - subnet_postava[i];
+	}
+	cout << endl << "______________________________________________________________________________________________________________________";
+	cout << endl << endl;
+	system("pause");
+	system("cls");
+}
+
+
+void ipsubnet() {
+	vector<int>vektorIPa;
+	vector<int>ispisMreza;
+	cout << "Enter the IP address by separating each octet by enter!" << endl;
+	int poljea[9], poljec[9], poljeb[9], poljed[9], ia = 0, ib = 0, ic = 0, id = 0, jprvi, prvioktet, drugioktet, trecioktet, cetvrtioktet;
+	do
+	{
+		cin >> prvioktet;
+		if (prvioktet > 255 || prvioktet < 0)
+		{
+			cout << "Enter a nuber between 0 and 255!" << endl;
+		}
+	} while (prvioktet < 0 || prvioktet>255);
+
+	while (ia < 8)
+	{
+		poljea[ia] = prvioktet % 2;
+		ia++;
+		prvioktet = prvioktet / 2;
+	}
+
+	for (jprvi = ia - 1; jprvi >= 0; jprvi--)
+	{
+		vektorIPa.push_back(poljea[jprvi]);
+
+	}
+	do
+	{
+		cin >> drugioktet;
+		if (drugioktet < 0 || drugioktet>255)
+		{
+			cout << "Enter a nuber between 0 and 255!" << endl;
+		}
+	} while (drugioktet < 0 || drugioktet>255);
+
+	while (ib < 8)
+	{
+		poljeb[ib] = drugioktet % 2;
+		ib++;
+		drugioktet = drugioktet / 2;
+	}
+
+	for (jprvi = ib - 1; jprvi >= 0; jprvi--)
+	{
+		vektorIPa.push_back(poljeb[jprvi]);
+
+	}
+	do
+	{
+		cin >> trecioktet;
+		if (trecioktet < 0 || trecioktet>255)
+		{
+			cout << "Enter a nuber between 0 and 255!" << endl;
+		}
+	} while (trecioktet < 0 || trecioktet>255);
+
+	while (ic < 8)
+	{
+		poljec[ic] = trecioktet % 2;
+		ic++;
+		trecioktet = trecioktet / 2;
+	}
+
+	for (jprvi = ic - 1; jprvi >= 0; jprvi--)
+	{
+		vektorIPa.push_back(poljec[jprvi]);
+
+	}
+
+	do
+	{
+		cin >> cetvrtioktet;
+		if (cetvrtioktet < 0 || cetvrtioktet>255)
+		{
+			cout << "Enter a nuber between 0 and 255!" << endl;
+		}
+	} while (cetvrtioktet < 0 || cetvrtioktet>255);
+
+	while (id < 8)
+	{
+		poljed[id] = cetvrtioktet % 2;
+		id++;
+		cetvrtioktet = cetvrtioktet / 2;
+	}
+
+	for (jprvi = id - 1; jprvi >= 0; jprvi--)
+	{
+		vektorIPa.push_back(poljed[jprvi]);
+
+	}
+
+	cout << "Enter Subnet Prefix!" << endl;
+	int prefix;
+
+	do
+	{
+		cin >> prefix;
+		if (prefix < 7 || prefix>32)
+		{
+			cout << "Enter Subnet Prefix that is greater than 7 and less than 32" << endl;
+		}
+	} while (prefix < 7 || prefix>32);
+
+	cout << "________________________________________________________________________________________________________________________" << endl;
+
+	cout << endl << "IP ADDRESS IN BINARY FORM: ";
+	for (int i = 0; i < 32; i++)
+	{
+		if (i == 8 || i == 16 || i == 24)
+		{
+			cout << ".";
+		}
+		cout << vektorIPa[i];
+	}
+	cout << endl << "UNITS OBTAINED BY PREFIX:  ";
+	for (int i = 0; i < 32; i++)
+	{
+		if (i == 8 || i == 16 || i == 24)
+		{
+			cout << ".";
+		}
+
+		if (i < prefix)
+		{
+			cout << 1;
+		}
+		else
+		{
+			cout << 0;
+		}
+
+	}
+	cout << endl;
+	cout << "IP ADDRESS IN BINARY FORM: ";
+	for (int i = 0; i < 32; i++)
+	{
+		if (i == 8 || i == 16 || i == 24)
+		{
+			cout << ".";
+		}
+		if (i >= prefix)
+		{
+			vektorIPa[i] = 0;
+		}
+		cout << vektorIPa[i];
+	}
+	cout << endl << endl;
+
+	cout << "Network: " << mrezaZaIP(vektorIPa, 8) << "." << mrezaZaIP(vektorIPa, 16) << "." << mrezaZaIP(vektorIPa, 24) << "." << mrezaZaIP(vektorIPa, 32) << endl;
+	cout << "Firft useful IP Address: ";
+
+	int broadcast[4];
+	int prva = broadcast[0] = mrezaZaIP(vektorIPa, 8);
+	int druga = broadcast[1] = mrezaZaIP(vektorIPa, 16);
+	int treca = broadcast[2] = mrezaZaIP(vektorIPa, 24);
+	int cetvrta = broadcast[3] = mrezaZaIP(vektorIPa, 32);
+
+	if (broadcast[3] >= 0 || broadcast[3] < 255) {
+		broadcast[3]++;
+	}
+	if (broadcast[3] == 255)
+	{
+		broadcast[3] = 0;
+		broadcast[2]++;
+	}
+	if (broadcast[2] == 256)
+	{
+		broadcast[2] = 0;
+		broadcast[1]++;
+	}
+	if (broadcast[1] == 256)
+	{
+		broadcast[1] = 0;
+		broadcast[0]++;
+	}
+	if (broadcast[0] == 256)
+	{
+		broadcast[0] = 0;
+		broadcast[1] = 0;
+		broadcast[2] = 0;
+		broadcast[3] = 1;
+
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (i == 1 || i == 2 || i == 3)
+		{
+			cout << ".";
+		}
+		cout << broadcast[i];
+	}
+	cout << endl;
+	cout << "Broadcast: ";
+
+	for (int i = 0; i < vektorIPa.size(); i++)
+	{
+		if (i == 8 || i == 16 || i == 24)
+		{
+			cout << ".";
+		}
+		if (i >= prefix)
+		{
+			vektorIPa[i] = 1;
+		}
+		else
+		{
+			vektorIPa[i] = 0;
+		}
+		cout << vektorIPa[i];
+	}
+	cout << endl;
+
+	if (prefix > 0 && prefix < 9)
+	{
+		broadcast[1] = BinUDecip(prefix);
+		broadcast[2] = 255;
+		broadcast[3] = 255;
+
+	}
+	if (prefix > 8 && prefix < 17)
+	{
+		broadcast[1] = druga + BinUDecip(prefix);
+		if (broadcast[1] > 255)
+		{
+			broadcast[0]++;
+			if (broadcast[0] > 255)
+			{
+			zenze:
+				broadcast[0] = 0;
+				broadcast[1] = 0;
+				broadcast[2] = 0;
+				broadcast[3] = 1;
+				goto dalje;
+			}
+			broadcast[1] = 0;
+			broadcast[2] = 0;
+			broadcast[3] = 0;
+			goto dalje;
+		}
+		broadcast[2] = 255;
+		broadcast[3] = 255;
+	}
+	if (prefix > 16 && prefix < 25)
+	{
+		broadcast[2] = treca + BinUDecip(prefix);
+		if (broadcast[2] > 255)
+		{
+		predaja:
+			broadcast[1]++;
+			broadcast[2] = 0;
+			broadcast[3] = 0;
+
+			if (broadcast[1] > 255)
+			{
+				broadcast[0]++;
+				broadcast[1] = 0;
+				broadcast[2] = 0;
+				broadcast[3] = 0;
+			}
+			if (broadcast[0] > 255)
+			{
+				goto zenze;
+			}
+		}
+		broadcast[3] = 255;
+	}
+	if (prefix > 24)
+	{
+		broadcast[3] = cetvrta + BinUDecip(prefix);
+		if (broadcast[3] > 255)
+		{
+			broadcast[2]++;
+			broadcast[3] = 0;
+			if (broadcast[2] > 255)
+			{
+				goto predaja;
+			}
+		}
+	}
+
+dalje:
+	cout << "Broadcast: ";
+	for (int i = 0; i < 4; i++)
+	{
+
+		if (i == 1 || i == 2 || i == 3)
+		{
+			cout << ".";
+		}
+		cout << broadcast[i];
+	}
+	cout << endl;
+
+	if (broadcast[3] == 0)
+	{
+		broadcast[3] = 255;
+		broadcast[2]--;
+		if (broadcast[2] == -1)
+		{
+			broadcast[2] = 255;
+			broadcast[1]--;
+		}
+		if (broadcast[1] == -1)
+		{
+			broadcast[1] = 255;
+			broadcast[0]--;
+		}
+		if (broadcast[0] == -1)
+		{
+			cout << "Ok stop" << endl;
+			broadcast[0] = 255;
+			broadcast[1] = 255;
+			broadcast[2] = 255;
+			broadcast[3] = 255;
+
+		}
+	}
+	else
+	{
+		broadcast[3]--;
+	}
+	cout << "Last usefu IP Address: ";
+	for (int i = 0; i < 4; i++)
+	{
+
+		if (i == 1 || i == 2 || i == 3)
+		{
+			cout << ".";
+		}
+		cout << broadcast[i];
+	}
+	cout << endl;
+	cout<<"_______________________________________________________________________________________________________________________"<<endl;
+}
+
+int main() {
+
+
+
+	subnet();
+	ipsubnet();
+
+
+	return 0;
+
+}
