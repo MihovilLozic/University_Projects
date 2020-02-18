@@ -78,7 +78,7 @@ void subnet() {
 	int hostovi;
 	int ipKlasa[4];
 	//Odabir Klasa
-	cout << "CHOOSE THE CLASS (A, B or C)!" << endl << "NOTE: WRITE IN SMALL LETTERS!" << endl;
+	cout << "ODABERITE KLASU(A,B ili C)!" << endl << "NAPOMENA: PISITE MALIM SLOVIMA!" << endl;
 	cin >> klasa;
 	cin.ignore();
 
@@ -107,9 +107,49 @@ void subnet() {
 		break;
 	}
 	//Broj Hostova
-	cout << "Enter the number of hosts!" << endl;
-	cin >> hostovi;
-	cin.ignore();
+	cout << "Unesite broj hostova!" << endl;
+	if (klasa=='a')
+	{
+		do
+		{
+			cin >> hostovi;
+			cin.ignore();
+			if (hostovi > 8000000) {
+				cout << "Unjeli ste prevelik broj. Unesite broj koji je manji od 16,777,214!" << endl;
+			}
+		} while (hostovi>8000000);
+
+	}
+	if (klasa=='b')
+	{
+		do
+		{
+			cin >> hostovi;
+			cin.ignore();
+			if (hostovi>1048544)
+			{
+			cout << "Unjeli ste prevelik broj. Unesite broj koji je manji od 1,048,544!" << endl;
+			}
+		} while (hostovi>1048544);
+
+	}
+	
+	if (klasa=='c')
+	{
+		do
+		{
+			cin >> hostovi;
+			cin.ignore();
+			if (hostovi>65024)
+			{
+			cout << "Unjeli ste prevelik broj. Unesite broj koji je manji od 65,024!" << endl;
+			}
+		} while (hostovi>65024);
+
+	}
+
+
+
 	//Racunjanje broadcast-a
 	int potencija = 0;
 	int temporary = 0;
@@ -119,9 +159,9 @@ void subnet() {
 		temporary - (temporary - 2);
 		potencija++;
 	}
-	cout << "The potency of Number 2 to cover the number of hosts is: " << potencija << " ==> " << pow(2, potencija) << endl;
+	cout << "Potencija broja 2 kojom se pokriva broj hostova je: " << potencija << " Odnosno " << pow(2, potencija) << endl;
 	int brojJedinica = 32 - potencija;
-	cout << "The number of ones must be: 32-potency => " << brojJedinica << endl;
+	cout << "Broj jedinica mora biti: 32-potencija => " << brojJedinica << endl;
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -144,28 +184,28 @@ void subnet() {
 
 	int subnet_postava[4];
 
-	if (brojJedinica <9)
+	if (brojJedinica <=8)
 	{
 		subnet_postava[0] = 255 - BinUDec(brojJedinica);
 		subnet_postava[1] = 255;
 		subnet_postava[2] = 255;
 		subnet_postava[3] = 255;
 	}
-	else if (brojJedinica >= 8 && brojJedinica <= 16)
+	else if (brojJedinica > 8 && brojJedinica <= 16)
 	{
 		subnet_postava[0] = 0;
 		subnet_postava[1] = 255 - BinUDec(brojJedinica);
 		subnet_postava[2] = 255;
 		subnet_postava[3] = 255;
 	}
-	else if (brojJedinica >= 16 && brojJedinica <= 24)
+	else if (brojJedinica > 16 && brojJedinica <= 24)
 	{
 		subnet_postava[0] = 0;
 		subnet_postava[1] = 0;
 		subnet_postava[2] = 255 - BinUDec(brojJedinica);
 		subnet_postava[3] = 255;
 	}
-	else
+	else if (brojJedinica>24)
 	{
 		subnet_postava[0] = 0;
 		subnet_postava[1] = 0;
@@ -176,13 +216,14 @@ void subnet() {
 	cout << endl;
 	cout<<"_______________________________________________________________________________________________________________________"<<endl;
 	cout << "NETWORK: " << ipKlasa[0] << "." << ipKlasa[1] << "." << ipKlasa[2] << "." << ipKlasa[3] << endl;
-	cout << "FIRST USEFUL IP ADDRESS: " << ipKlasa[0] << "." << ipKlasa[1] << "." << ipKlasa[2] << "." << ipKlasa[3] + 1 << endl;
+	cout << "PRVA KORISNA IP ADRESA: " << ipKlasa[0] << "." << ipKlasa[1] << "." << ipKlasa[2] << "." << ipKlasa[3] + 1 << endl;
 
 	cout << "BROADCAST: ";
 	int broadcast[4];
 	for (int i = 0; i < 4; i++)
 	{
 		broadcast[i] = subnet_postava[i] + ipKlasa[i];
+
 		if (broadcast[i] > 255)
 		{
 			int temp = broadcast[i] - 255;
@@ -205,7 +246,7 @@ void subnet() {
 	subnet_postavaa[2] = broadcast[2];
 	subnet_postavaa[3] = broadcast[3] - 1;
 
-	cout << "LAST USEFUL IP ADDRESS: ";
+	cout << "Zadnja korisna IP adresa: ";
 	for (int i = 0; i < 4; i++)
 	{
 		if (i == 1 || i == 2 || i == 3)
@@ -213,11 +254,13 @@ void subnet() {
 			cout << ".";
 		}
 		cout << subnet_postavaa[i];
+
 	}
+
 
 	//Izracun subnet maske
 	cout << endl;
-	cout << "SUBNET MASK: ";
+	cout << "SUBNET MASKA: ";
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -238,14 +281,14 @@ void subnet() {
 void ipsubnet() {
 	vector<int>vektorIPa;
 	vector<int>ispisMreza;
-	cout << "Enter the IP address by separating each octet by enter!" << endl;
+	cout << "Upisite IP adresu, tako da svaki oktet razdvojite enterom!" << endl;
 	int poljea[9], poljec[9], poljeb[9], poljed[9], ia = 0, ib = 0, ic = 0, id = 0, jprvi, prvioktet, drugioktet, trecioktet, cetvrtioktet;
 	do
 	{
 		cin >> prvioktet;
 		if (prvioktet > 255 || prvioktet < 0)
 		{
-			cout << "Enter a nuber between 0 and 255!" << endl;
+			cout << "Unesite broj izmedju 0 i 255!" << endl;
 		}
 	} while (prvioktet < 0 || prvioktet>255);
 
@@ -266,7 +309,7 @@ void ipsubnet() {
 		cin >> drugioktet;
 		if (drugioktet < 0 || drugioktet>255)
 		{
-			cout << "Enter a nuber between 0 and 255!" << endl;
+			cout << "Unesite broj izmedju 0 i 255!" << endl;
 		}
 	} while (drugioktet < 0 || drugioktet>255);
 
@@ -287,7 +330,7 @@ void ipsubnet() {
 		cin >> trecioktet;
 		if (trecioktet < 0 || trecioktet>255)
 		{
-			cout << "Enter a nuber between 0 and 255!" << endl;
+			cout << "Unesite broj izmedju 0 i 255!" << endl;
 		}
 	} while (trecioktet < 0 || trecioktet>255);
 
@@ -309,7 +352,7 @@ void ipsubnet() {
 		cin >> cetvrtioktet;
 		if (cetvrtioktet < 0 || cetvrtioktet>255)
 		{
-			cout << "Enter a nuber between 0 and 255!" << endl;
+			cout << "Unesite broj izmedju 0 i 255!" << endl;
 		}
 	} while (cetvrtioktet < 0 || cetvrtioktet>255);
 
@@ -326,7 +369,7 @@ void ipsubnet() {
 
 	}
 
-	cout << "Enter Subnet Prefix!" << endl;
+	cout << "Upisite subnet prefix!" << endl;
 	int prefix;
 
 	do
@@ -334,13 +377,13 @@ void ipsubnet() {
 		cin >> prefix;
 		if (prefix < 7 || prefix>32)
 		{
-			cout << "Enter Subnet Prefix that is greater than 7 and less than 32" << endl;
+			cout << "Unesite prefiks koji je veci od 7 i mani od 32" << endl;
 		}
 	} while (prefix < 7 || prefix>32);
 
 	cout << "________________________________________________________________________________________________________________________" << endl;
 
-	cout << endl << "IP ADDRESS IN BINARY FORM: ";
+	cout << endl << "IP ADRESA U BINARNOM OBLIKU:       ";
 	for (int i = 0; i < 32; i++)
 	{
 		if (i == 8 || i == 16 || i == 24)
@@ -349,7 +392,7 @@ void ipsubnet() {
 		}
 		cout << vektorIPa[i];
 	}
-	cout << endl << "UNITS OBTAINED BY PREFIX:  ";
+	cout << endl << "JEDINICE DOBIVENE PREFIXOM:        ";
 	for (int i = 0; i < 32; i++)
 	{
 		if (i == 8 || i == 16 || i == 24)
@@ -368,7 +411,7 @@ void ipsubnet() {
 
 	}
 	cout << endl;
-	cout << "IP ADDRESS IN BINARY FORM: ";
+	cout << "IP ADRESA MREZE U BINARNOM OBLIKU: ";
 	for (int i = 0; i < 32; i++)
 	{
 		if (i == 8 || i == 16 || i == 24)
@@ -383,8 +426,8 @@ void ipsubnet() {
 	}
 	cout << endl << endl;
 
-	cout << "Network: " << mrezaZaIP(vektorIPa, 8) << "." << mrezaZaIP(vektorIPa, 16) << "." << mrezaZaIP(vektorIPa, 24) << "." << mrezaZaIP(vektorIPa, 32) << endl;
-	cout << "Firft useful IP Address: ";
+	cout << "Mreza: " << mrezaZaIP(vektorIPa, 8) << "." << mrezaZaIP(vektorIPa, 16) << "." << mrezaZaIP(vektorIPa, 24) << "." << mrezaZaIP(vektorIPa, 32) << endl;
+	cout << "Prva korisna IP adresa: ";
 
 	int broadcast[4];
 	int prva = broadcast[0] = mrezaZaIP(vektorIPa, 8);
@@ -545,7 +588,7 @@ dalje:
 		}
 		if (broadcast[0] == -1)
 		{
-			cout << "Ok stop" << endl;
+			cout << "Pa dobro sta radis vise" << endl;
 			broadcast[0] = 255;
 			broadcast[1] = 255;
 			broadcast[2] = 255;
@@ -557,7 +600,7 @@ dalje:
 	{
 		broadcast[3]--;
 	}
-	cout << "Last usefu IP Address: ";
+	cout << "Zadnja korisna: ";
 	for (int i = 0; i < 4; i++)
 	{
 
